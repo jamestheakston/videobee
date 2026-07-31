@@ -492,7 +492,7 @@
         const SUPABASE_ANON_KEY = 'sb_publishable__LInDJPMKS10Ufa5SQYsPg_Lw5FvLbH';
         
         // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // STUN server configuration
         // For production, you should add TURN servers here as well
@@ -602,7 +602,7 @@
 
             // Optional: Create room record in database
             try {
-                await supabase.from('rooms').insert({
+                await supabaseClient.from('rooms').insert({
                     room_code: roomCode,
                     active: true
                 });
@@ -637,7 +637,7 @@
         async function joinRoomChannel() {
             const channelName = `room:${state.roomCode}`;
             
-            state.channel = supabase.channel(channelName, {
+            state.channel = supabaseClient.channel(channelName, {
                 config: {
                     presence: {
                         key: state.clientId
@@ -769,7 +769,7 @@
             // Leave the channel
             if (state.channel) {
                 await state.channel.untrack();
-                await supabase.removeChannel(state.channel);
+                await supabaseClient.removeChannel(state.channel);
                 state.channel = null;
             }
 
