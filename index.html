@@ -859,19 +859,7 @@
                 }
             });
 
-            // Set up presence state
-            await state.channel.subscribe(async (status) => {
-                if (status === 'SUBSCRIBED') {
-                    // Track our presence
-                    await state.channel.track({
-                        display_name: state.displayName,
-                        client_id: state.clientId,
-                        online_at: new Date().toISOString()
-                    });
-                }
-            });
-
-            // Handle presence events
+            // Handle presence events (must be set up before subscribe)
             state.channel.on('presence', { event: 'sync' }, () => {
                 handlePresenceSync();
             });
@@ -884,9 +872,21 @@
                 handleParticipantLeave(leftPresences[0]);
             });
 
-            // Handle WebRTC signaling messages
+            // Handle WebRTC signaling messages (must be set up before subscribe)
             state.channel.on('broadcast', { event: 'webrtc-signal' }, ({ payload }) => {
                 handleWebRTCSignal(payload);
+            });
+
+            // Set up presence state and subscribe
+            await state.channel.subscribe(async (status) => {
+                if (status === 'SUBSCRIBED') {
+                    // Track our presence
+                    await state.channel.track({
+                        display_name: state.displayName,
+                        client_id: state.clientId,
+                        online_at: new Date().toISOString()
+                    });
+                }
             });
         }
 
